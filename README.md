@@ -1,1 +1,2 @@
-# innohack-2.0
+# resume-analyzer
+Vit Hackathon Project
