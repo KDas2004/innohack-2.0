@@ -12,10 +12,10 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- 2. CSS for an Animated Gradient Background & Glassmorphism UI ---
+# --- 2. CSS for an Animated Gradient Background & Top Dashboard ---
 custom_css = """
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display.swap');
 
     :root {
         --primary-color: #6366f1; /* Indigo */
@@ -45,17 +45,21 @@ custom_css = """
         font-weight: 700 !important;
     }
     
-    [data-testid="stSidebar"] {
+    /* NEW: Styling for the top control panel */
+    div[data-testid="stHorizontalBlock"] {
         background: rgba(30, 41, 59, 0.5);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 2rem;
     }
     
-    .stTabs [data-baseweb="tab-list"], .st-expander, .stAlert, .st-emotion-cache-1r4qj8v {
+    /* Glassmorphism for other containers */
+    .stTabs [data-baseweb="tab-list"], .st-expander, .stAlert {
         background: rgba(40, 51, 69, 0.5) !important;
         backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         border-radius: 12px !important;
     }
@@ -81,6 +85,7 @@ custom_css = """
         color: #ffffff;
         border-radius: 8px;
     }
+
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
@@ -124,30 +129,30 @@ def extract_text_from_file(file):
         else:
             st.error("Unsupported file type.")
             return None
-        
-        if not text.strip():
-            st.error("Error: This file contains no text.")
-            return None
-        return text
+        return text if text.strip() else None
     except Exception as e:
-        st.error("An error occurred while reading the file.")
-        st.exception(e)
+        st.error(f"An error occurred while reading the file: {e}")
         return None
 
-# --- UI LOGIC ---
-# Using the sidebar for a cleaner layout
-with st.sidebar:
-    st.title("✨ AI Career Toolkit")
-    st.markdown("Your personal career co-pilot.")
-    st.header("1. Upload Resume")
-    uploaded_file = st.file_uploader("Upload your resume (PDF or DOCX)", type=["pdf", "docx"], label_visibility="collapsed")
-    st.header("2. Enter Target Job")
-    target_job = st.text_input("e.g., Senior Python Developer", help="Used for targeted analysis.")
+# --- UI LOGIC with Top Dashboard (NO Sidebar) ---
+st.title("✨ AI Career Toolkit")
+
+# --- Top Control Panel ---
+with st.container():
+    col1, col2 = st.columns(2)
+    with col1:
+        st.header("1. Upload Resume")
+        uploaded_file = st.file_uploader("Upload your resume (PDF or DOCX)", type=["pdf", "docx"], label_visibility="collapsed")
+    
+    with col2:
+        st.header("2. Enter Target Job")
+        target_job = st.text_input("e.g., Senior Python Developer", help="Used for targeted analysis.")
+
+st.divider()
 
 # Main panel logic
 if uploaded_file is None:
-    st.title("Welcome to Your AI Career Co-Pilot")
-    st.info("💡 Upload your resume in the sidebar to begin your personalized career analysis.")
+    st.info("💡 Upload your resume in the panel above to begin your personalized career analysis.")
     st.subheader("Features:")
     st.markdown("""
     - **📄 Resume Feedback:** Get a general score or a specific ATS score against a job description.
@@ -164,12 +169,7 @@ else:
 
         with left_column:
             st.subheader("Live Resume Editor")
-            edited_text = st.text_area(
-                "Resume Content",
-                resume_text,
-                height=700,
-                label_visibility="collapsed"
-            )
+            edited_text = st.text_area("Resume Content", resume_text, height=700, label_visibility="collapsed")
 
         with right_column:
             tab1, tab2, tab3, tab4 = st.tabs(["📄 Resume Feedback", "🗺️ Learning Roadmap", "🎯 Career Insights", "✍️ Cover Letter"])
